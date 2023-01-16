@@ -1,5 +1,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <sstream>
 #include <iomanip>
@@ -12,8 +13,9 @@ int main()
 {
     int frame_count = 0;
     int current_fps = 60;
+    float frame_time;
     float current_time1;
-    float current_time2;
+    //float current_time2;
 
     // create the window
     sf::RenderWindow window;
@@ -40,6 +42,8 @@ int main()
     sf::Sprite sprite;
     sprite.setTexture(texture);
 
+    float q = 0;
+
     // run the main loop
     bool running = true;
     while (running)
@@ -64,9 +68,15 @@ int main()
 
         }
 
-        current_time2 = clock2.getElapsedTime().asSeconds();
+        frame_time = clock2.restart().asSeconds();
 
-        shaderF.setUniform("iTime", current_time2);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            q -= 2 * frame_time;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            q += 2 * frame_time;
+
+
+        shaderF.setUniform("iTime", q);
 
         // draw...
         window.draw(sprite, &shaderF);
@@ -84,10 +94,10 @@ int main()
         }
 
         std::ostringstream display_fps;
-        display_fps << "FPS: " << current_fps;
+        display_fps << "FPS: " << current_fps << "\narrows to turn";
         sf::Font font;
         font.loadFromFile("brohoney.ttf");
-        sf::Text text(display_fps.str(), font, 40);
+        sf::Text text(display_fps.str(), font, 30);
         text.setFillColor(sf::Color::White);
         text.setPosition(37.f, 27.f);
         text.setOrigin(0.f, 0.f);
